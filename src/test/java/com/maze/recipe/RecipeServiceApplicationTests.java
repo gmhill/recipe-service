@@ -1,4 +1,4 @@
-package com.maze.recipe_service;
+package com.maze.recipe;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
