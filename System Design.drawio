@@ -1,47 +1,61 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:141.0) Gecko/20100101 Firefox/141.0" version="28.1.0" pages="2">
   <diagram name="System Diagram" id="DEjAkvfVBnrq21iUWTod">
-    <mxGraphModel dx="1186" dy="588" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1183" dy="670" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="SlA5vQETYR5UFXLKFYL_-18" value="" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
-          <mxGeometry x="120" y="140" width="200" height="200" as="geometry" />
+          <mxGeometry x="30" y="140" width="200" height="200" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-10" value="" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
-          <mxGeometry x="365" y="140" width="310" height="310" as="geometry" />
+          <mxGeometry x="510" y="140" width="310" height="310" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-14" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="SlA5vQETYR5UFXLKFYL_-1" target="SlA5vQETYR5UFXLKFYL_-13" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-1" value="Recipe Service" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
-          <mxGeometry x="550" y="210" width="80" height="80" as="geometry" />
+          <mxGeometry x="695" y="210" width="80" height="80" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="SlA5vQETYR5UFXLKFYL_-2" target="SlA5vQETYR5UFXLKFYL_-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-2" value="Rest API" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
-          <mxGeometry x="410" y="210" width="80" height="80" as="geometry" />
+          <mxGeometry x="555" y="210" width="80" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="SlA5vQETYR5UFXLKFYL_-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="SlA5vQETYR5UFXLKFYL_-3" target="SlA5vQETYR5UFXLKFYL_-2" edge="1">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="SlA5vQETYR5UFXLKFYL_-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="SlA5vQETYR5UFXLKFYL_-3" target="z5nm4TViNvcAAGMjiByU-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="260" y="250" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-3" value="iOS app" style="rounded=0;whiteSpace=wrap;html=1;direction=south;" parent="1" vertex="1">
-          <mxGeometry x="190" y="190" width="60" height="120" as="geometry" />
+          <mxGeometry x="100" y="190" width="60" height="120" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-6" value="&lt;div&gt;PostgreSQL DB&lt;/div&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" parent="1" vertex="1">
-          <mxGeometry x="548.25" y="530" width="83.5" height="90" as="geometry" />
+          <mxGeometry x="693.25" y="530" width="83.5" height="90" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-11" value="Spring Boot App Server" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="425" y="150" width="190" height="30" as="geometry" />
+          <mxGeometry x="570" y="150" width="190" height="30" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-15" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="SlA5vQETYR5UFXLKFYL_-13" target="SlA5vQETYR5UFXLKFYL_-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-13" value="Repository Layer" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
-          <mxGeometry x="550" y="350" width="80" height="80" as="geometry" />
+          <mxGeometry x="695" y="350" width="80" height="80" as="geometry" />
         </mxCell>
         <mxCell id="SlA5vQETYR5UFXLKFYL_-19" value="Client Layer" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="170" y="150" width="100" height="30" as="geometry" />
+          <mxGeometry x="80" y="150" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="z5nm4TViNvcAAGMjiByU-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="z5nm4TViNvcAAGMjiByU-1" target="SlA5vQETYR5UFXLKFYL_-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="z5nm4TViNvcAAGMjiByU-1" value="Tyk Gateway" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
+          <mxGeometry x="320" y="190" width="120" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="z5nm4TViNvcAAGMjiByU-3" value="Redis" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;" vertex="1" parent="1">
+          <mxGeometry x="350" y="390" width="60" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="z5nm4TViNvcAAGMjiByU-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="z5nm4TViNvcAAGMjiByU-1" target="z5nm4TViNvcAAGMjiByU-3">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
