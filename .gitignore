@@ -25,3 +25,4 @@ replay_pid*
 
 # IDE files
 .idea/
+.DS_Store
