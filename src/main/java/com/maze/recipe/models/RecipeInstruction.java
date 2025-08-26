@@ -1,5 +1,7 @@
 package com.maze.recipe.models;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Getter
@@ -12,7 +14,8 @@ public class RecipeInstruction {
     private Long recipeId;
 
     @EqualsAndHashCode.Exclude
-    private Integer stepOrder;
+    private Integer orderIndex;
 
+    @NotBlank(message = "Instruction text cannot be empty")
     private String instructionText;
 }
