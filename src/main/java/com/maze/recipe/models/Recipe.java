@@ -1,5 +1,10 @@
 package com.maze.recipe.models;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.util.List;
@@ -13,9 +18,14 @@ public class Recipe {
     @EqualsAndHashCode.Exclude
     private Long id;
 
+    @NotBlank(message = "Recipe name cannot be empty")
     private String recipeName;
 
+    @NotEmpty(message = "Recipe must have at least one ingredient")
+    @Valid
     private List<RecipeIngredient> recipeIngredients;
 
+    @NotEmpty(message = "Recipe must have at least one instruction")
+    @Valid
     private List<RecipeInstruction> recipeInstructions;
 }
