@@ -1,14 +1,16 @@
 package com.maze.recipe.repository;
 
 import com.maze.recipe.models.Recipe;
+import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Repository
 public class InMemoryRecipeRepository implements RecipeRepository {
-    private final AtomicLong idCounter = new AtomicLong(0L);
+    private final AtomicLong idCounter = new AtomicLong(1L);
     private final HashMap<Long, Recipe> inMemoryRepository = new HashMap<>();
 
     @Override
