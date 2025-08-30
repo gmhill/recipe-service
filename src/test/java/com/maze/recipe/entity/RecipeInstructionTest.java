@@ -1,4 +1,4 @@
-package com.maze.recipe.models;
+package com.maze.recipe.entity;
 
 import org.junit.jupiter.api.Test;
 
