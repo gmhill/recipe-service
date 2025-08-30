@@ -1,8 +1,8 @@
 package com.maze.recipe.repository;
 
-import com.maze.recipe.models.Recipe;
-import com.maze.recipe.models.RecipeIngredient;
-import com.maze.recipe.models.RecipeInstruction;
+import com.maze.recipe.entity.Recipe;
+import com.maze.recipe.entity.RecipeIngredient;
+import com.maze.recipe.entity.RecipeInstruction;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
