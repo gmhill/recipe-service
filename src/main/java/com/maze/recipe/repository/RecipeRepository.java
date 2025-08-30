@@ -1,7 +1,6 @@
 package com.maze.recipe.repository;
 
-import com.maze.recipe.models.Recipe;
-import org.springframework.stereotype.Repository;
+import com.maze.recipe.entity.Recipe;
 
 import java.util.Collection;
 import java.util.Optional;

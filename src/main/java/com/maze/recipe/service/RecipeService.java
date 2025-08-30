@@ -5,7 +5,7 @@ import com.maze.recipe.dto.response.RecipeResponseDto;
 import com.maze.recipe.exception.InvalidIdException;
 import com.maze.recipe.exception.RecipeNotFoundException;
 import com.maze.recipe.mapper.RecipeMapper;
-import com.maze.recipe.models.Recipe;
+import com.maze.recipe.entity.Recipe;
 import com.maze.recipe.repository.RecipeRepository;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
