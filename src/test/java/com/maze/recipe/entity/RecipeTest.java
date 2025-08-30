@@ -1,11 +1,10 @@
-package com.maze.recipe.models;
+package com.maze.recipe.entity;
 
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 class RecipeTest {
 

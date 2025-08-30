@@ -1,6 +1,5 @@
-package com.maze.recipe.models;
+package com.maze.recipe.entity;
 
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
