@@ -1,0 +1,82 @@
+name: Claude Self-Heal
+
+# Watches the main CI workflow. If it fails on a PR that Claude opened (the
+# "ai-managed" label, set by claude.yml), ask Claude to look at the failure
+# and push a fix -- capped at 3 attempts so a persistently broken PR gets
+# handed back to a human instead of looping forever.
+
+on:
+  workflow_run:
+    workflows: ["Java CI with Gradle"]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  id-token: write
+
+jobs:
+  self-heal:
+    if: >
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Gather PR context and check retry budget
+        id: ctx
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          PR_JSON=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --state open --json number,headRefName,labels --jq '.[0] // empty')
+
+          if [ -z "$PR_JSON" ]; then
+            echo "No open PR for branch $BRANCH; skipping."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          MANAGED=$(echo "$PR_JSON" | jq -r '.labels | any(.name == "ai-managed")')
+          if [ "$MANAGED" != "true" ]; then
+            echo "PR is not ai-managed; skipping."
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          NUMBER=$(echo "$PR_JSON" | jq -r '.number')
+          echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+
+          ATTEMPTS=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "claude-self-heal.yml" --branch "$BRANCH" --json status --jq '[.[] | select(.status == "completed")] | length')
+          echo "Prior self-heal attempts on this branch: $ATTEMPTS"
+
+          if [ "$ATTEMPTS" -ge 3 ]; then
+            echo "proceed=false" >> "$GITHUB_OUTPUT"
+            gh pr edit "$NUMBER" --repo "$GITHUB_REPOSITORY" --add-label "needs-human"
+            gh pr comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "Self-heal gave up after 3 attempts -- CI is still failing. Needs a human look."
+          else
+            echo "proceed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout PR branch
+        if: steps.ctx.outputs.proceed == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.ctx.outputs.branch }}
+          fetch-depth: 1
+
+      - name: Ask Claude to fix the failing build
+        if: steps.ctx.outputs.proceed == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          additional_permissions: |
+            actions: read
+          prompt: |
+            CI ("Java CI with Gradle") just failed on PR #${{ steps.ctx.outputs.number }},
+            branch ${{ steps.ctx.outputs.branch }}, run ${{ github.event.workflow_run.html_url }}.
+            Run `gh run view ${{ github.event.workflow_run.id }} --log-failed` to see what broke,
+            fix the underlying issue, and push the fix to this same branch (do not open a new PR).
+            Leave a short comment on the PR explaining what broke and what you changed.
