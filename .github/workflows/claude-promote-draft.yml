@@ -1,0 +1,45 @@
+name: Claude Promote Draft
+
+# Watches the main CI workflow. When it succeeds on a draft PR carrying the
+# "ai-managed" label (set by claude.yml), flips the PR to ready-for-review
+# so it's just sitting there waiting on approval by the time a human looks.
+
+on:
+  workflow_run:
+    workflows: ["Java CI with Gradle"]
+    types: [completed]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  promote:
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark ai-managed draft PRs as ready for review
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          PR_JSON=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH" --state open --json number,isDraft,labels --jq '.[0] // empty')
+
+          if [ -z "$PR_JSON" ]; then
+            echo "No open PR for branch $BRANCH; skipping."
+            exit 0
+          fi
+
+          IS_DRAFT=$(echo "$PR_JSON" | jq -r '.isDraft')
+          MANAGED=$(echo "$PR_JSON" | jq -r '.labels | any(.name == "ai-managed")')
+
+          if [ "$IS_DRAFT" != "true" ] || [ "$MANAGED" != "true" ]; then
+            echo "Not an ai-managed draft PR; skipping."
+            exit 0
+          fi
+
+          NUMBER=$(echo "$PR_JSON" | jq -r '.number')
+          gh pr ready "$NUMBER" --repo "$GITHUB_REPOSITORY"
+          gh pr comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "CI passed -- marking ready for review."

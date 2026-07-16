@@ -19,9 +19,9 @@ jobs:
       (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pull-requests: read
-      issues: read
+      contents: write # Required for Claude to create branches and push commits
+      pull-requests: write # Required for Claude to open PRs and add labels
+      issues: write # Required for Claude to comment back on the triggering issue
       id-token: write
       actions: read # Required for Claude to read CI results on PRs
     steps:
@@ -43,8 +43,9 @@ jobs:
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
 
-          # Optional: Add claude_args to customize behavior and configuration
-          # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
-          # or https://code.claude.com/docs/en/cli-reference for available options
-          # claude_args: '--allowed-tools Bash(gh pr *)'
+          # Standing instructions appended to every run, on top of whatever the triggering
+          # comment/issue asked for. These make the self-heal and auto-promote workflows work:
+          # they key off the "ai-managed" label and the draft state set here.
+          claude_args: |
+            --append-system-prompt "When implementing a ticket end-to-end: create a new branch, implement the change, and run the project's build/tests locally until they pass. Then open the pull request as a draft (gh pr create --draft) with a description summarizing what the ticket asked for and what you changed, and add the 'ai-managed' label to it (gh pr edit --add-label ai-managed). Do not mark the PR ready for review yourself -- a separate automated workflow does that once CI passes."
 
