@@ -16,6 +16,10 @@ permissions:
   actions: read
   id-token: write
 
+concurrency:
+  group: claude-self-heal-${{ github.event.workflow_run.head_branch }}
+  cancel-in-progress: false
+
 jobs:
   self-heal:
     if: >
@@ -49,7 +53,12 @@ jobs:
           echo "number=$NUMBER" >> "$GITHUB_OUTPUT"
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
-          ATTEMPTS=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "claude-self-heal.yml" --branch "$BRANCH" --json status --jq '[.[] | select(.status == "completed")] | length')
+          # Count our own marker comments rather than `gh run list --branch`: for a
+          # workflow_run-triggered run, GitHub reports head_branch as the default branch
+          # (main, since workflow_run only fires off the definition on the default branch),
+          # not the source PR's branch -- so filtering runs by $BRANCH there never matches
+          # and the cap below would never trigger.
+          ATTEMPTS=$(gh pr view "$NUMBER" --repo "$GITHUB_REPOSITORY" --json comments --jq '[.comments[].body | select(startswith("Self-heal attempt"))] | length')
           echo "Prior self-heal attempts on this branch: $ATTEMPTS"
 
           if [ "$ATTEMPTS" -ge 3 ]; then
@@ -58,6 +67,7 @@ jobs:
             gh pr comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "Self-heal gave up after 3 attempts -- CI is still failing. Needs a human look."
           else
             echo "proceed=true" >> "$GITHUB_OUTPUT"
+            gh pr comment "$NUMBER" --repo "$GITHUB_REPOSITORY" --body "Self-heal attempt $((ATTEMPTS + 1))/3: CI failed, asking Claude to investigate and push a fix."
           fi
 
       - name: Checkout PR branch
