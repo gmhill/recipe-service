@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,6 +60,27 @@ class RecipeControllerTest {
 
         // When/Then
         mockMvc.perform(get("/recipes/99"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deleteRecipeReturnsNoContentWhenDeleted() throws Exception {
+        // Given
+        RecipeResponseDto recipe = getRecipeResponseDto();
+        when(recipeService.deleteRecipe(1L)).thenReturn(recipe);
+
+        // When/Then
+        mockMvc.perform(delete("/recipes/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void deleteRecipeReturnsNotFoundWhenMissing() throws Exception {
+        // Given
+        when(recipeService.deleteRecipe(99L)).thenThrow(new RecipeNotFoundException("Unable to find recipe with id 99"));
+
+        // When/Then
+        mockMvc.perform(delete("/recipes/99"))
                 .andExpect(status().isNotFound());
     }
 

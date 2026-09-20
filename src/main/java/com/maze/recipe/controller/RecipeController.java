@@ -4,6 +4,7 @@ import com.maze.recipe.dto.response.RecipeResponseDto;
 import com.maze.recipe.exception.RecipeNotFoundException;
 import com.maze.recipe.service.RecipeService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,16 @@ public class RecipeController {
     public ResponseEntity<RecipeResponseDto> getRecipe(@PathVariable long id) {
         try {
             return ResponseEntity.ok(recipeService.readRecipe(id));
+        } catch (RecipeNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRecipe(@PathVariable long id) {
+        try {
+            recipeService.deleteRecipe(id);
+            return ResponseEntity.noContent().build();
         } catch (RecipeNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
