@@ -55,6 +55,6 @@ jobs:
           # comment/issue asked for. These make the self-heal and auto-promote workflows work:
           # they key off the "ai-managed" label and the draft state set here.
           claude_args: |
-            --allowedTools "Bash(gh issue create:*),Bash(gh issue close:*),Bash(./gradlew *)"
+            --allowedTools "Bash(gh issue create:*),Bash(gh issue close:*),Bash(./gradlew *),Bash(gh pr create:*),Bash(gh pr edit:*),Bash(gh pr comment:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr checks:*),Bash(gh run view:*),Bash(gh issue view:*)"
             --append-system-prompt "When implementing a ticket end-to-end: create a new branch, implement the change, and run the project's build/tests locally until they pass. Then open the pull request as a draft (gh pr create --draft) with a description summarizing what the ticket asked for and what you changed, and add the 'ai-managed' label to it (gh pr edit --add-label ai-managed). Do not mark the PR ready for review yourself -- a separate automated workflow does that once CI passes."
 
