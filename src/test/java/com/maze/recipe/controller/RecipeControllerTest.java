@@ -7,6 +7,8 @@ import com.maze.recipe.dto.request.CreateRecipeDto;
 import com.maze.recipe.dto.response.IngredientResponseDto;
 import com.maze.recipe.dto.response.InstructionResponseDto;
 import com.maze.recipe.dto.response.RecipeResponseDto;
+import com.maze.recipe.exception.InvalidIdException;
+import com.maze.recipe.exception.InvalidQuantityException;
 import com.maze.recipe.exception.RecipeNotFoundException;
 import com.maze.recipe.service.RecipeService;
 import jakarta.validation.ConstraintViolationException;
@@ -73,7 +75,21 @@ class RecipeControllerTest {
 
         // When/Then
         mockMvc.perform(get("/recipes/99"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Unable to find recipe with id 99"));
+    }
+
+    @Test
+    void getRecipeByIdReturnsBadRequestForInvalidId() throws Exception {
+        // Given
+        when(recipeService.readRecipe(-1L)).thenThrow(new InvalidIdException("Provided ID must be greater than 0"));
+
+        // When/Then
+        mockMvc.perform(get("/recipes/-1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Provided ID must be greater than 0"));
     }
 
     @Test
@@ -105,7 +121,24 @@ class RecipeControllerTest {
         mockMvc.perform(post("/recipes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRecipeDto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
+    }
+
+    @Test
+    void createRecipeReturnsBadRequestForInvalidQuantity() throws Exception {
+        // Given
+        CreateRecipeDto createRecipeDto = getCreateRecipeDto();
+        when(recipeService.createRecipe(any(CreateRecipeDto.class)))
+                .thenThrow(new InvalidQuantityException("Invalid quantity format: abc"));
+
+        // When/Then
+        mockMvc.perform(post("/recipes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRecipeDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Invalid quantity format: abc"));
     }
 
     @Test
@@ -126,7 +159,21 @@ class RecipeControllerTest {
 
         // When/Then
         mockMvc.perform(delete("/recipes/99"))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Unable to find recipe with id 99"));
+    }
+
+    @Test
+    void deleteRecipeReturnsBadRequestForInvalidId() throws Exception {
+        // Given
+        when(recipeService.deleteRecipe(-1L)).thenThrow(new InvalidIdException("Provided ID must be greater than 0"));
+
+        // When/Then
+        mockMvc.perform(delete("/recipes/-1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Provided ID must be greater than 0"));
     }
 
     private RecipeResponseDto getRecipeResponseDto() {
