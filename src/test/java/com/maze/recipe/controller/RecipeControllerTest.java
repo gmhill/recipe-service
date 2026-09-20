@@ -49,8 +49,8 @@ class RecipeControllerTest {
         // When/Then
         mockMvc.perform(get("/recipes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].recipeName").value("Sifted Flour Recipe"));
+                .andExpect(jsonPath("$[0].id").value(recipe.id()))
+                .andExpect(jsonPath("$[0].recipeName").value(recipe.recipeName()));
     }
 
     @Test
@@ -62,8 +62,8 @@ class RecipeControllerTest {
         // When/Then
         mockMvc.perform(get("/recipes/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.recipeName").value("Sifted Flour Recipe"));
+                .andExpect(jsonPath("$.id").value(recipe.id()))
+                .andExpect(jsonPath("$.recipeName").value(recipe.recipeName()));
     }
 
     @Test
@@ -89,9 +89,9 @@ class RecipeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRecipeDto)))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/recipes/1"))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.recipeName").value("Sifted Flour Recipe"));
+                .andExpect(header().string("Location", "/recipes/" + recipe.id()))
+                .andExpect(jsonPath("$.id").value(recipe.id()))
+                .andExpect(jsonPath("$.recipeName").value(recipe.recipeName()));
     }
 
     @Test
