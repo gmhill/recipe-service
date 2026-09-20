@@ -5,6 +5,7 @@ import com.maze.recipe.dto.request.CreateIngredientDto;
 import com.maze.recipe.dto.request.CreateInstructionDto;
 import com.maze.recipe.dto.request.CreateRecipeDto;
 import com.maze.recipe.dto.response.RecipeResponseDto;
+import com.maze.recipe.exception.RecipeNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,16 @@ class RecipeServiceTest {
         // Then
         RecipeResponseDto actualRecipe = service.readRecipe(id);
         assertThat(actualRecipe.id()).isPositive();
+    }
+
+    @Test
+    void readRecipeThrowsNotFoundForUnseededId() {
+        // Given
+        service.createRecipe(getCreateRecipeDto());
+        service.createRecipe(getCreateRecipeDto());
+
+        // When/Then
+        assertThatThrownBy(() -> service.readRecipe(Long.MAX_VALUE)).isInstanceOf(RecipeNotFoundException.class);
     }
 
     @Test
