@@ -146,6 +146,57 @@ class RecipeRepositoryTest {
                 .allMatch(instruction -> expectedId.equals(instruction.getRecipeId())));
     }
 
+    @Test
+    void existingRecipeCanBeUpdated() {
+        // Given
+        Long id = repository.create(getRecipe());
+        Recipe updatedRecipe = getSecondRecipe();
+        updatedRecipe.setId(id);
+
+        // When
+        Optional<Recipe> result = repository.update(updatedRecipe);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(repository.findById(id)).contains(updatedRecipe);
+    }
+
+    @Test
+    void updateCascadesIdToSubObjects() {
+        // Given
+        Long id = repository.create(getRecipe());
+        Recipe updatedRecipe = getSecondRecipe();
+        updatedRecipe.setId(id);
+
+        // When
+        repository.update(updatedRecipe);
+
+        // Then
+        assertThat(updatedRecipe.getRecipeIngredients().stream()
+                .allMatch(ingredient -> id.equals(ingredient.getRecipeId()))).isTrue();
+        assertThat(updatedRecipe.getRecipeInstructions().stream()
+                .allMatch(instruction -> id.equals(instruction.getRecipeId()))).isTrue();
+    }
+
+    @Test
+    void updatingNonExistentRecipeReturnsEmpty() {
+        // Given
+        Recipe recipe = getRecipe();
+        recipe.setId(99L);
+
+        // When/Then
+        assertThat(repository.update(recipe)).isEmpty();
+    }
+
+    @Test
+    void updatingRecipeWithNullIdReturnsEmpty() {
+        // Given
+        Recipe recipe = getRecipe();
+
+        // When/Then
+        assertThat(repository.update(recipe)).isEmpty();
+    }
+
     private Recipe getRecipe() {
         Long id = null;
         String recipeName = "A test recipe";

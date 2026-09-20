@@ -23,10 +23,12 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -139,6 +141,69 @@ class RecipeControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("Invalid quantity format: abc"));
+    }
+
+    @Test
+    void updateRecipeReturnsOkWithUpdatedBody() throws Exception {
+        // Given
+        CreateRecipeDto updateDto = getCreateRecipeDto();
+        RecipeResponseDto recipe = getRecipeResponseDto();
+        when(recipeService.updateRecipe(eq(1L), any(CreateRecipeDto.class))).thenReturn(recipe);
+
+        // When/Then
+        mockMvc.perform(put("/recipes/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(recipe.id()))
+                .andExpect(jsonPath("$.recipeName").value(recipe.recipeName()));
+    }
+
+    @Test
+    void updateRecipeReturnsNotFoundWhenMissing() throws Exception {
+        // Given
+        CreateRecipeDto updateDto = getCreateRecipeDto();
+        when(recipeService.updateRecipe(eq(99L), any(CreateRecipeDto.class)))
+                .thenThrow(new RecipeNotFoundException("Unable to find recipe with id 99"));
+
+        // When/Then
+        mockMvc.perform(put("/recipes/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.message").value("Unable to find recipe with id 99"));
+    }
+
+    @Test
+    void updateRecipeReturnsBadRequestForInvalidId() throws Exception {
+        // Given
+        CreateRecipeDto updateDto = getCreateRecipeDto();
+        when(recipeService.updateRecipe(eq(-1L), any(CreateRecipeDto.class)))
+                .thenThrow(new InvalidIdException("Provided ID must be greater than 0"));
+
+        // When/Then
+        mockMvc.perform(put("/recipes/-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.message").value("Provided ID must be greater than 0"));
+    }
+
+    @Test
+    void updateRecipeReturnsBadRequestForInvalidPayload() throws Exception {
+        // Given
+        CreateRecipeDto updateDto = getCreateRecipeDto();
+        when(recipeService.updateRecipe(eq(1L), any(CreateRecipeDto.class)))
+                .thenThrow(new ConstraintViolationException(Set.of()));
+
+        // When/Then
+        mockMvc.perform(put("/recipes/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updateDto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400));
     }
 
     @Test
