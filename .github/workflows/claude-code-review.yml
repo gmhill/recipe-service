@@ -12,11 +12,11 @@ on:
 
 jobs:
   claude-review:
-    # Optional: Filter by PR author
-    # if: |
-    #   github.event.pull_request.user.login == 'external-contributor' ||
-    #   github.event.pull_request.user.login == 'new-developer' ||
-    #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
+    # Only review PRs from trusted authors so outsiders can't spend our Claude quota.
+    # Dependabot is allowed explicitly (see allowed_bots below).
+    if: |
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association) ||
+      github.event.pull_request.user.login == 'dependabot[bot]'
 
     runs-on: ubuntu-latest
     permissions:
