@@ -54,4 +54,21 @@ public class InMemoryRecipeRepository implements RecipeRepository {
 
         return id;
     }
+
+    @Override
+    public Optional<Recipe> update(Recipe recipe) {
+        Long id = recipe.getId();
+        if (id == null || !inMemoryRepository.containsKey(id)) {
+            return Optional.empty();
+        }
+
+        // Cascade id, mirroring create()
+        recipe.getRecipeIngredients().stream()
+                .forEach(ingredient -> ingredient.setRecipeId(id));
+        recipe.getRecipeInstructions().stream()
+                .forEach(instruction -> instruction.setRecipeId(id));
+        inMemoryRepository.put(id, recipe);
+
+        return Optional.of(recipe);
+    }
 }

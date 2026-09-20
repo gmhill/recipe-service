@@ -131,6 +131,57 @@ class RecipeRepositoryTest {
     }
 
     @Test
+    void existingRecipeCanBeUpdated() {
+        // Given
+        Long id = repository.create(getRecipe());
+        Recipe updatedRecipe = getSecondRecipe();
+        updatedRecipe.setId(id);
+
+        // When
+        Optional<Recipe> result = repository.update(updatedRecipe);
+
+        // Then
+        assertThat(result).isNotEmpty();
+        assertThat(repository.findById(id)).contains(updatedRecipe);
+    }
+
+    @Test
+    void updateCascadesIdToSubObjects() {
+        // Given
+        Long id = repository.create(getRecipe());
+        Recipe updatedRecipe = getSecondRecipe();
+        updatedRecipe.setId(id);
+
+        // When
+        repository.update(updatedRecipe);
+
+        // Then
+        assertThat(updatedRecipe.getRecipeIngredients())
+                .allMatch(ingredient -> id.equals(ingredient.getRecipeId()));
+        assertThat(updatedRecipe.getRecipeInstructions())
+                .allMatch(instruction -> id.equals(instruction.getRecipeId()));
+    }
+
+    @Test
+    void nonExistentRecipeCantBeUpdated() {
+        // Given
+        Recipe recipe = getRecipe();
+        recipe.setId(99L);
+
+        // When/Then
+        assertThat(repository.update(recipe)).isEmpty();
+    }
+
+    @Test
+    void recipeWithNullIdCantBeUpdated() {
+        // Given
+        Recipe recipe = getRecipe();
+
+        // When/Then
+        assertThat(repository.update(recipe)).isEmpty();
+    }
+
+    @Test
     void idConsistentAmongRecipeAndSubObjects() {
         // Given
         Recipe recipe = getRecipe();

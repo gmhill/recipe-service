@@ -5,6 +5,7 @@ import com.maze.recipe.dto.request.CreateIngredientDto;
 import com.maze.recipe.dto.request.CreateInstructionDto;
 import com.maze.recipe.dto.request.CreateRecipeDto;
 import com.maze.recipe.dto.response.RecipeResponseDto;
+import com.maze.recipe.exception.InvalidIdException;
 import com.maze.recipe.exception.RecipeNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,47 @@ class RecipeServiceTest {
 
         // When/Then
         assertThatThrownBy(() -> service.readRecipe(Long.MAX_VALUE)).isInstanceOf(RecipeNotFoundException.class);
+    }
+
+    @Test
+    void updatedRecipeReadsBackWithChanges() {
+        // Given
+        long id = service.createRecipe(getCreateRecipeDto());
+        CreateRecipeDto updateDto = getCreateRecipeDtoWithName("Updated Recipe Name");
+
+        // When
+        RecipeResponseDto updatedRecipe = service.updateRecipe(id, updateDto);
+
+        // Then
+        assertThat(updatedRecipe.id()).isEqualTo(id);
+        assertThat(updatedRecipe.recipeName()).isEqualTo("Updated Recipe Name");
+        assertThat(service.readRecipe(id).recipeName()).isEqualTo("Updated Recipe Name");
+    }
+
+    @Test
+    void updateRecipeThrowsNotFoundForUnseededId() {
+        // When/Then
+        assertThatThrownBy(() -> service.updateRecipe(Long.MAX_VALUE, getCreateRecipeDto()))
+                .isInstanceOf(RecipeNotFoundException.class);
+    }
+
+    @Test
+    void updateRecipeThrowsInvalidIdForNonPositiveId() {
+        // When/Then
+        assertThatThrownBy(() -> service.updateRecipe(0L, getCreateRecipeDto()))
+                .isInstanceOf(InvalidIdException.class);
+        assertThatThrownBy(() -> service.updateRecipe(-1L, getCreateRecipeDto()))
+                .isInstanceOf(InvalidIdException.class);
+    }
+
+    @Test
+    void updateRecipeWithBlankNameIsInvalid() {
+        // Given
+        long id = service.createRecipe(getCreateRecipeDto());
+        CreateRecipeDto updateDto = getCreateRecipeDtoWithName("");
+
+        // When/Then
+        assertThatThrownBy(() -> service.updateRecipe(id, updateDto)).isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
