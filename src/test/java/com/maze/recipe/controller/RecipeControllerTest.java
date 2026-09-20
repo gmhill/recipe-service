@@ -1,21 +1,31 @@
 package com.maze.recipe.controller;
 
+import tools.jackson.databind.ObjectMapper;
+import com.maze.recipe.dto.request.CreateIngredientDto;
+import com.maze.recipe.dto.request.CreateInstructionDto;
+import com.maze.recipe.dto.request.CreateRecipeDto;
 import com.maze.recipe.dto.response.IngredientResponseDto;
 import com.maze.recipe.dto.response.InstructionResponseDto;
 import com.maze.recipe.dto.response.RecipeResponseDto;
 import com.maze.recipe.exception.RecipeNotFoundException;
 import com.maze.recipe.service.RecipeService;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
+import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -23,6 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RecipeControllerTest {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private RecipeService recipeService;
@@ -64,6 +77,38 @@ class RecipeControllerTest {
     }
 
     @Test
+    void createRecipeReturnsCreatedWithLocationAndBody() throws Exception {
+        // Given
+        CreateRecipeDto createRecipeDto = getCreateRecipeDto();
+        RecipeResponseDto recipe = getRecipeResponseDto();
+        when(recipeService.createRecipe(any(CreateRecipeDto.class))).thenReturn(1L);
+        when(recipeService.readRecipe(1L)).thenReturn(recipe);
+
+        // When/Then
+        mockMvc.perform(post("/recipes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRecipeDto)))
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/recipes/1"))
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.recipeName").value("Sifted Flour Recipe"));
+    }
+
+    @Test
+    void createRecipeReturnsBadRequestForInvalidPayload() throws Exception {
+        // Given
+        CreateRecipeDto createRecipeDto = getCreateRecipeDto();
+        when(recipeService.createRecipe(any(CreateRecipeDto.class)))
+                .thenThrow(new ConstraintViolationException(Set.of()));
+
+        // When/Then
+        mockMvc.perform(post("/recipes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(createRecipeDto)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void deleteRecipeReturnsNoContentWhenDeleted() throws Exception {
         // Given
         RecipeResponseDto recipe = getRecipeResponseDto();
@@ -88,5 +133,11 @@ class RecipeControllerTest {
         IngredientResponseDto ingredient = new IngredientResponseDto("1", "cup", "flour");
         InstructionResponseDto instruction = new InstructionResponseDto("Sift it.");
         return new RecipeResponseDto(1L, "Sifted Flour Recipe", List.of(ingredient), List.of(instruction));
+    }
+
+    private CreateRecipeDto getCreateRecipeDto() {
+        CreateIngredientDto ingredient = new CreateIngredientDto("1", "cup", "flour");
+        CreateInstructionDto instruction = new CreateInstructionDto("Sift it.");
+        return new CreateRecipeDto("Sifted Flour Recipe", List.of(ingredient), List.of(instruction));
     }
 }
