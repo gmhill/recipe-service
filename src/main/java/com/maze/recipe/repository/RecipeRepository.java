@@ -11,4 +11,5 @@ public interface RecipeRepository {
     Optional<Recipe> deleteById(Long id);
     boolean existsById(Long id);
     long create(Recipe recipe);
+    Optional<Recipe> update(Recipe recipe);
 }
