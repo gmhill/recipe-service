@@ -2,7 +2,6 @@ package com.maze.recipe.controller;
 
 import com.maze.recipe.dto.request.CreateRecipeDto;
 import com.maze.recipe.dto.response.RecipeResponseDto;
-import com.maze.recipe.exception.RecipeNotFoundException;
 import com.maze.recipe.service.RecipeService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,31 +31,19 @@ public class RecipeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<RecipeResponseDto> getRecipe(@PathVariable long id) {
-        try {
-            return ResponseEntity.ok(recipeService.readRecipe(id));
-        } catch (RecipeNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(recipeService.readRecipe(id));
     }
 
     @PostMapping
     public ResponseEntity<RecipeResponseDto> createRecipe(@RequestBody CreateRecipeDto createRecipeDto) {
-        try {
-            long id = recipeService.createRecipe(createRecipeDto);
-            RecipeResponseDto created = recipeService.readRecipe(id);
-            return ResponseEntity.created(URI.create("/recipes/" + id)).body(created);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        long id = recipeService.createRecipe(createRecipeDto);
+        RecipeResponseDto created = recipeService.readRecipe(id);
+        return ResponseEntity.created(URI.create("/recipes/" + id)).body(created);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRecipe(@PathVariable long id) {
-        try {
-            recipeService.deleteRecipe(id);
-            return ResponseEntity.noContent().build();
-        } catch (RecipeNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        recipeService.deleteRecipe(id);
+        return ResponseEntity.noContent().build();
     }
 }
