@@ -72,7 +72,7 @@ jobs:
 
       - name: Checkout PR branch
         if: steps.ctx.outputs.proceed == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.ctx.outputs.branch }}
           fetch-depth: 1
