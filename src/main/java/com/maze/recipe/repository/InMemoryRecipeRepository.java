@@ -1,6 +1,7 @@
 package com.maze.recipe.repository;
 
 import com.maze.recipe.entity.Recipe;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -8,7 +9,9 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
+// Test-only double for PostgresRecipeRepository; stays under main so RecipeRepositoryTest can construct it directly.
 @Repository
+@Profile("test")
 public class InMemoryRecipeRepository implements RecipeRepository {
     private final AtomicLong idCounter = new AtomicLong(1L);
     private final HashMap<Long, Recipe> inMemoryRepository = new HashMap<>();
