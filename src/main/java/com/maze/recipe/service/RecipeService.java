@@ -60,6 +60,23 @@ public class RecipeService {
     }
 
     @Transactional
+    public RecipeResponseDto updateRecipe(long id, CreateRecipeDto createRecipeDto) {
+        validateId(id);
+
+        Recipe recipe = recipeMapper.toRecipe(createRecipeDto);
+        recipe.setId(id);
+
+        Set<ConstraintViolation<Recipe>> violations = validator.validate(recipe);
+        if (!violations.isEmpty()) {
+            throw new ConstraintViolationException(violations);
+        }
+
+        return recipeRepository.update(recipe)
+                .map(recipeMapper::toResponseDto)
+                .orElseThrow(() -> new RecipeNotFoundException("Unable to find recipe with id " + id));
+    }
+
+    @Transactional
     public RecipeResponseDto deleteRecipe(long id) {
         validateId(id);
 
