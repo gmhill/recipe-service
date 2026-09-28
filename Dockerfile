@@ -20,8 +20,7 @@ FROM eclipse-temurin:25-jre AS runtime
 WORKDIR /app
 
 RUN addgroup --system recipe && adduser --system --ingroup recipe recipe
-COPY --from=build /workspace/build/libs/*.jar app.jar
-RUN chown recipe:recipe app.jar
+COPY --from=build --chown=recipe:recipe /workspace/build/libs/*.jar app.jar
 USER recipe
 
 EXPOSE 8080
