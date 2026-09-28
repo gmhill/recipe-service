@@ -43,3 +43,9 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+// Only the executable Spring Boot jar is needed downstream (e.g. Dockerfile);
+// skip producing the plain (non-executable) jar alongside it.
+tasks.named('jar') {
+	enabled = false
+}
