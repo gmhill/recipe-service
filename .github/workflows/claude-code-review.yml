@@ -43,3 +43,13 @@ jobs:
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
+      - name: Report blocked tool calls
+        if: always() && steps.claude-review.outputs.execution_file != ''
+        env:
+          EXECUTION_FILE: ${{ steps.claude-review.outputs.execution_file }}
+        run: |
+          denials=$(jq -c '[.[] | select(.type == "result")] | last | .permission_denials // []' "$EXECUTION_FILE")
+          if [ "$(jq 'length' <<<"$denials")" -gt 0 ]; then
+            jq -r '.[] | "::error title=Blocked tool call::\(.tool_name): \(.tool_input | tostring | .[0:300])"' <<<"$denials"
+            exit 1
+          fi
