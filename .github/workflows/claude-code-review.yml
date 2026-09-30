@@ -19,6 +19,8 @@ jobs:
     #   github.event.pull_request.author_association == 'FIRST_TIME_CONTRIBUTOR'
 
     runs-on: ubuntu-latest
+    # claude-code-action has no timeout of its own; without this a hung run uses GitHub's 6-hour default.
+    timeout-minutes: 15
     permissions:
       contents: read
       pull-requests: read
