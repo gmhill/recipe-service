@@ -87,7 +87,7 @@ public class RecipeService {
     }
 
     private void validateId(long id) {
-        if (id < 0L) {
+        if (id <= 0L) {
             throw new InvalidIdException("Provided ID must be greater than 0");
         }
     }
