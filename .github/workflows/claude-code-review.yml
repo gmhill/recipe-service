@@ -40,6 +40,9 @@ jobs:
           plugins: 'code-review@claude-code-plugins'
           prompt: '/code-review:code-review ${{ github.repository }}/pull/${{ github.event.pull_request.number }}'
           allowed_bots: "dependabot[bot],claude[bot],claude,github-actions[bot],github-actions"
+          # In CI the session ends when Claude ends its turn, so background work never gets collected.
+          claude_args: >-
+            --append-system-prompt "You are running non-interactively in CI. Your session ends as soon as you end your turn, and anything still running in the background is lost. Do not run tasks or agents in the background; wait for every step to finish before ending your turn."
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
 
